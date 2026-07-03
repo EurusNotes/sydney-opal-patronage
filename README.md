@@ -4,14 +4,14 @@
 decisions: where Sydney's foot traffic recovered, when people actually come to the
 office, and how the CBD quietly became a destination.**
 
-🔗 **[Live dashboard](https://chenxi-ten.vercel.app/opal)** · 📊 [Data quality notes](docs/DATA_QUALITY.md) · 🐍 [Streamlit explorer](dashboard/)
+🔗 **[Live dashboard](https://sydney-opal-patronage.vercel.app)** · 📊 [Data quality notes](docs/DATA_QUALITY.md) · 🐍 [Streamlit explorer](dashboard/)
 
 ---
 
 ## Headline findings
 
 Each finding is written for the person who can act on it — the full twelve are on the
-[live dashboard](https://chenxi-ten.vercel.app/opal). A sample:
+[live dashboard](https://sydney-opal-patronage.vercel.app). A sample:
 
 | # | Finding | Who should care |
 |---|---------|-----------------|

@@ -1,0 +1,74 @@
+{
+  "files_read": 2372,
+  "bad_schema_files": [],
+  "empty_files": [],
+  "rows_total": 1610884,
+  "rows_fact": 1371675,
+  "date_min": "2020-01-01",
+  "date_max": "2026-07-01",
+  "missing_days": [
+    "2021-06-03",
+    "2021-06-04"
+  ],
+  "duplicate_keys": 0,
+  "unparseable_ons": 0,
+  "unparseable_offs": 0,
+  "masked_pct_overall": 27.4,
+  "mask_threshold_periods": {
+    "lt50": [
+      "2020-01-01",
+      "2024-06-30"
+    ],
+    "lt100": [
+      "2024-07-01",
+      "2026-07-01"
+    ]
+  },
+  "masked_pct_by_region": {
+    "Newcastle and surrounds": 63.0,
+    "Wollongong and surrounds": 39.3,
+    "North Sydney": 30.8,
+    "Parramatta": 27.5,
+    "Macquarie Park": 23.0,
+    "Strathfield": 22.1,
+    "Chatswood": 20.5,
+    "Other": 15.5,
+    "Sydney CBD": 9.5
+  },
+  "masked_pct_by_mode": {
+    "UNKNOWN": 82.9,
+    "Ferry": 42.3,
+    "Bus": 25.7,
+    "Train": 22.7,
+    "Light rail": 20.9
+  },
+  "sum_regions_vs_allnsw_ratio": {
+    "count": 239209.0,
+    "mean": 1.178,
+    "std": 0.606,
+    "min": 1.0,
+    "25%": 1.0,
+    "50%": 1.003,
+    "75%": 1.045,
+    "max": 9.0
+  },
+  "modes": [
+    "Bus",
+    "Ferry",
+    "Light rail",
+    "Train",
+    "UNKNOWN"
+  ],
+  "regions": [
+    "All - NSW",
+    "Chatswood",
+    "Macquarie Park",
+    "Newcastle and surrounds",
+    "North Sydney",
+    "Other",
+    "Parramatta",
+    "Strathfield",
+    "Sydney CBD",
+    "Wollongong and surrounds"
+  ]
+}

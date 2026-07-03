@@ -1,0 +1,13 @@
+# Raw data: 2,372 daily files (~70MB), reproducible via pipeline/download_opal.py
+data/raw
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

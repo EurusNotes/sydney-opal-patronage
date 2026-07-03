@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sydney, After the Office — Opal Patronage 2020–2026</title>
+<meta name="description" content="Six years of Opal tap data: where Sydney's foot traffic recovered, when people actually come to the office, and how the city became a destination.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root {
+    --accent: #0B7285; --accent-soft: #EDF6F7; --ink: #1B2A32; --muted: #5C6F78;
+    --line: #E3EAEC; --bad: #D64550; --good: #2B8A3E; --bg: #FAFBFC;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         color: var(--ink); background: var(--bg); line-height: 1.55; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  header { background: linear-gradient(160deg, #07333d 0%, #0B7285 90%); color: #fff;
+           padding: 72px 0 56px; }
+  header h1 { font-size: 2.6rem; letter-spacing: -1px; line-height: 1.15; }
+  header .sub { margin-top: 14px; font-size: 1.12rem; color: #CDE7EB; max-width: 640px; }
+  header .byline { margin-top: 22px; font-size: .9rem; color: #9EC9D0; }
+  header a { color: #fff; }
+
+  .statstrip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+               gap: 14px; margin-top: 36px; }
+  .stat { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+          border-radius: 12px; padding: 14px 16px; }
+  .stat b { display: block; font-size: 1.7rem; }
+  .stat span { font-size: .82rem; color: #BFE0E5; }
+
+  section { padding: 54px 0 10px; }
+  h2 { font-size: 1.7rem; letter-spacing: -.5px; margin-bottom: 6px; }
+  .lede { color: var(--muted); max-width: 700px; margin-bottom: 26px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+           gap: 16px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px;
+          padding: 20px 22px; }
+  .card .num { font-size: 2.1rem; font-weight: 750; color: var(--accent); }
+  .card .num.down { color: var(--bad); }
+  .card h3 { font-size: .98rem; margin: 4px 0 6px; }
+  .card p { font-size: .88rem; color: var(--muted); }
+  .aud { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .3px;
+         text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+         border-radius: 20px; padding: 2px 10px; margin-bottom: 8px; }
+
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 14px;
+           padding: 22px; margin-bottom: 22px; }
+  .panel h3 { margin-bottom: 4px; }
+  .panel .note { font-size: .85rem; color: var(--muted); margin-bottom: 14px; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 860px) { .duo { grid-template-columns: 1fr; } }
+  .chart { width: 100%; height: 400px; }
+  #map { height: 440px; border-radius: 10px; }
+
+  .sowhat { background: var(--accent-soft); border-left: 4px solid var(--accent);
+            border-radius: 0 10px 10px 0; padding: 13px 16px; font-size: .93rem;
+            margin-top: 4px; }
+  .sowhat b { color: var(--accent); }
+
+  footer { margin-top: 60px; padding: 34px 0 44px; border-top: 1px solid var(--line);
+           font-size: .86rem; color: var(--muted); }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Sydney, After the Office</h1>
+    <p class="sub">1.6 million hourly records of Opal tap data, 2020–2026. Where foot
+      traffic actually recovered, when people really come in, and how the CBD quietly
+      turned into a destination.</p>
+    <p class="byline">Analysis &amp; build: Chenxi Liu ·
+      <a href="https://github.com/EurusNotes">GitHub</a> ·
+      Data: Transport for NSW Open Data (CC-BY)</p>
+    <div class="statstrip">
+      <div class="stat"><b>2,372</b><span>daily files, bulk-ingested &amp; QA'd</span></div>
+      <div class="stat"><b>88%</b><span>CBD weekday recovery vs Feb 2020</span></div>
+      <div class="stat"><b>+49%</b><span>CBD Saturday nights vs pre-COVID</span></div>
+      <div class="stat"><b>72%</b><span>North Sydney weekdays — the laggard</span></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Twelve findings, each written for the person who can act on it</h2>
+    <p class="lede">Numbers computed from the full six-and-a-half-year fact table,
+      weekdays benchmarked against February 2020. An insight isn't "what the data says" —
+      it's what you should do differently after reading it.</p>
+    <div class="cards">
+      <div class="card"><span class="aud">Property investors</span>
+        <div class="num down">72% / 136%</div>
+        <h3>North Sydney is two markets now</h3>
+        <p>Weekday demand is down a quarter; Saturdays run at 136% of 2020. Office values
+        priced on commuter footfall deserve a discount — but ground-floor tenancy re-mixed
+        toward weekend hospitality is the repositioning play. Screen conversion candidates
+        here first.</p></div>
+      <div class="card"><span class="aud">Retail leasing</span>
+        <div class="num">+49%</div>
+        <h3>Lease for Saturday night, not Monday lunch</h3>
+        <p>CBD Saturday evenings beat pre-COVID by half. If your tenancy mix still targets
+        the office worker (dry cleaner, salad bar, 9–5 trading), you're leasing to a
+        shrinking customer. Late-trading F&amp;B justifies premium rents now.</p></div>
+      <div class="card"><span class="aud">Office landlords</span>
+        <div class="num">4.8 days</div>
+        <h3>Underwrite a 4.8-day city</h3>
+        <p>Monday runs 15% below midweek and isn't coming back. Don't model occupancy
+        recovery to 2019 in your DCF; do model flight-to-quality — tenants consolidating
+        four good days in better buildings.</p></div>
+      <div class="card"><span class="aud">Transport planners</span>
+        <div class="num down">−25%</div>
+        <h3>The 5pm crunch case for reallocating service</h3>
+        <p>The evening peak shrank twice as fast as total demand. Capacity built for the
+        2019 peak is idle capital: the service case has shifted to evenings, weekends and
+        the shoulder hours where demand now grows.</p></div>
+      <div class="card"><span class="aud">Precinct policy</span>
+        <div class="num">45→66%</div>
+        <h3>Fund the visitor city — it's working</h3>
+        <p>CBD weekends went from 45% to 66% of weekday volume. Activation spending has a
+        measurable return; the binding constraint is now late-night transport home, not
+        reasons to come in.</p></div>
+      <div class="card"><span class="aud">Site selection</span>
+        <div class="num">2×</div>
+        <h3>Pay the light-rail corridor premium</h3>
+        <p>Light rail doubled its network share (7.6→14.1%) while bus and train drifted
+        down. For QSR and convenience formats, corridor stops are where incremental foot
+        traffic is actually appearing.</p></div>
+      <div class="card"><span class="aud">Contrarian check</span>
+        <div class="num down">16.8→14.8%</div>
+        <h3>Don't overpay for the "western CBD" story yet</h3>
+        <p>Parramatta's volume <em>as a share of the CBD's</em> fell since 2020. The
+        growth narrative may be right long-term, but transit demand says it isn't here
+        yet — negotiate entry prices accordingly.</p></div>
+      <div class="card"><span class="aud">Risk &amp; scenario teams</span>
+        <div class="num down">6%</div>
+        <h3>Your stress test has a floor: it's 6%</h3>
+        <p>The worst weekday hit 6% of normal; the worst month (Aug 2021, Delta) was 11% —
+        deeper than 2020. Use these as the realistic tail scenario for any
+        footfall-dependent revenue model, and note the second shock cut deeper than the first.</p></div>
+      <div class="card"><span class="aud">F&amp;B operators</span>
+        <div class="num">16→19.5%</div>
+        <h3>Staff for a plateau, not a spike</h3>
+        <p>Midday grew from 16% to 19.5% of CBD weekday taps: the day is flatter. Roster
+        and inventory built around two sharp peaks now mismatch how demand actually
+        arrives — spread it, especially Tuesday to Thursday.</p></div>
+      <div class="card"><span class="aud">Tourism &amp; harbourside assets</span>
+        <div class="num">+44%</div>
+        <h3>The harbour is a weekend business now</h3>
+        <p>Weekend ferry taps beat pre-COVID by 44% and now out-traffic weekdays. For
+        Circular Quay and Manly retail, weight your covenant analysis toward leisure
+        spend, not commuter convenience.</p></div>
+      <div class="card"><span class="aud">Valuers &amp; CFOs</span>
+        <div class="num">+3.5 pts/yr</div>
+        <h3>No rebound left to underwrite</h3>
+        <p>83% → 86% → 90% over three years: a crawl, not a wave. Any valuation or budget
+        that assumes a snap back to 2019 is booking revenue that arrives, at best, around
+        2029. Hybrid is the baseline case.</p></div>
+      <div class="card"><span class="aud">Analysts (a method note)</span>
+        <div class="num">167%</div>
+        <h3>…that wasn't</h3>
+        <p>Wollongong's headline growth survives imputation tests but collapses under mode
+        decomposition: bus taps tripled while trains stayed flat. Coverage change, not
+        demand. The most exciting number in your dataset is the one to interrogate first.
+        <a href="#honesty">See the method ↓</a></p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>1 · Where foot traffic actually recovered</h2>
+    <p class="lede">Average weekday tap-ons, 2026 H1, as a share of February 2020.
+      Bubble size = current volume; colour = recovery. Greyed regions are flagged for
+      data-reliability issues.</p>
+    <div class="panel duo">
+      <div><div id="map"></div></div>
+      <div><div id="rankChart" class="chart" style="height:440px"></div></div>
+    </div>
+    <div class="panel">
+      <h3>The long road back</h3>
+      <p class="note">Monthly weekday average vs Feb 2020, by centre. Dotted lines mark the
+        two lockdowns.</p>
+      <div id="monthlyChart" class="chart"></div>
+    </div>
+    <p class="sowhat"><b>So what?</b> Capital allocated on 2019 assumptions is mispriced.
+      The growth stories are Macquarie Park and Chatswood; the turnaround case is North
+      Sydney, where weekday demand is down a quarter but Saturdays run at 136% of 2020.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>2 · The three-day office week</h2>
+    <p class="lede">Weekday volume relative to that centre's own Tue–Thu average, 2026.</p>
+    <div class="panel duo">
+      <div>
+        <h3>Monday is the new Sunday</h3>
+        <p class="note">% of midweek average. Green = full strength.</p>
+        <div id="dowChart" class="chart"></div>
+      </div>
+      <div>
+        <h3>The peak got shorter and flatter</h3>
+        <p class="note">CBD average weekday tap-ons by hour.</p>
+        <div id="hourChart" class="chart"></div>
+      </div>
+    </div>
+    <p class="sowhat"><b>So what?</b> A CBD "week" is effectively 4.8 days of pre-hybrid
+      demand, and the 5pm crunch is down 25%. Rosters, service frequency and Monday
+      promotions should be planned against this curve, not the 2019 one.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>3 · The leisure shift</h2>
+    <p class="lede">Weekday demand shrank. Evenings and weekends did the opposite.</p>
+    <div class="panel duo">
+      <div>
+        <h3>Saturday nights beat 2020 by half</h3>
+        <p class="note">CBD evening (6pm–midnight) tap-ons by day of week.</p>
+        <div id="eveningChart" class="chart"></div>
+      </div>
+      <div>
+        <h3>Weekends closed the gap</h3>
+        <p class="note">CBD weekend volume as % of weekday, by quarter.</p>
+        <div id="ratioChart" class="chart"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>How Sydney moves changed too</h3>
+      <p class="note">Share of network tap-ons by mode.</p>
+      <div id="modeChart" class="chart" style="height:340px"></div>
+    </div>
+    <p class="sowhat"><b>So what?</b> Precinct activation, late-night transport and retail
+      leasing should follow the visitors, not the commuters. The demand is arriving at
+      8pm Saturday, not 8am Monday.</p>
+  </div>
+</section>
+
+<section id="honesty">
+  <div class="wrap">
+    <h2>4 · The 167% that wasn't</h2>
+    <p class="lede">Wollongong's "recovery" was the most exciting number in this dataset —
+      which is exactly why it deserved interrogation first.</p>
+    <div class="panel">
+      <h3>Bus taps tripled. Trains didn't move.</h3>
+      <p class="note">Annual tap-ons (millions), Wollongong &amp; surrounds. 2026 is a
+        half year. Organic demand does not grow like the orange line.</p>
+      <div id="wollChart" class="chart" style="height:360px"></div>
+    </div>
+    <p class="sowhat"><b>Method.</b> Three checks: (1) imputation sensitivity — setting
+      every privacy-masked cell to 0 or to its ceiling moves the figure only 166–168%, so
+      masking isn't the cause; (2) mode decomposition — bus 1.16M→3.78M in three years
+      while train held ~1M, the signature of a reporting-coverage change; (3) no public
+      announcement found to explain it as demand. Verdict: flagged as a structural break
+      and excluded from headline comparisons. Newcastle is excluded too — at 52–58%
+      masked, its recovery reads anywhere from 77% to 109% depending on assumptions.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>Method notes.</b> Source: TfNSW Opal Patronage open dataset (CC-BY), hourly
+      tap-ons/offs by mode and commercial centre, 2020-01-01 → 2026-07-01. Values under
+      the privacy threshold (&lt;50 to Jun 2024, &lt;100 after — a mid-series change) are
+      midpoint-imputed and flagged; aggregate rows and the UNKNOWN mode are excluded.
+      Pipeline: Python (pandas/pyarrow) bulk ingest → schema validation → fact table →
+      this page (ECharts + Leaflet, no framework). Full QA notes and code on
+      <a href="https://github.com/EurusNotes">GitHub</a>.</p>
+    <p style="margin-top:10px">© 2026 Chenxi Liu · Built as an independent analysis;
+      not affiliated with Transport for NSW.</p>
+  </div>
+</footer>
+
+<script>
+const ACCENT = "#0B7285", BAD = "#D64550", MUTED = "#8AA0A8";
+const GRID = { left: 55, right: 20, top: 40, bottom: 40 };
+
+function recColor(v) {
+  if (v === null) return MUTED;
+  if (v < 80) return "#D64550";
+  if (v < 95) return "#E8890C";
+  if (v < 105) return "#D4B106";
+  return "#2B8A3E";
+}
+
+// ---------- map ----------
+const map = L.map("map", { scrollWheelZoom: false }).setView([-33.75, 151.05], 8);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  { attribution: "© OpenStreetMap © CARTO", maxZoom: 12 }).addTo(map);
+DATA.regions.forEach(r => {
+  const flagged = !!r.flag;
+  L.circleMarker([r.lat, r.lon], {
+    radius: Math.max(9, Math.sqrt(r.volume) / 18),
+    color: flagged ? MUTED : recColor(r.recovery),
+    fillColor: flagged ? MUTED : recColor(r.recovery),
+    fillOpacity: .55, weight: 2, dashArray: flagged ? "4 3" : null,
+  }).addTo(map).bindPopup(
+    `<b>${r.name}</b><br>Weekday recovery: ${r.recovery}%<br>` +
+    `Saturday recovery: ${r.satRecovery}%<br>Avg daily tap-ons: ${r.volume.toLocaleString()}` +
+    (flagged ? `<br><i>⚠ ${r.flag}</i>` : "")
+  );
+});
+
+// ---------- ranked bar ----------
+const rk = [...DATA.regions].sort((a, b) => a.recovery - b.recovery);
+echarts.init(document.getElementById("rankChart")).setOption({
+  grid: { left: 120, right: 50, top: 20, bottom: 30 },
+  xAxis: { type: "value", max: 180, axisLabel: { formatter: "{value}%" } },
+  yAxis: { type: "category", data: rk.map(r => r.name.replace(" and surrounds", "*")) },
+  series: [{
+    type: "bar",
+    data: rk.map(r => ({
+      value: r.recovery,
+      itemStyle: { color: r.flag ? MUTED : recColor(r.recovery), opacity: r.flag ? .45 : 1 },
+    })),
+    label: { show: true, position: "right", formatter: p => p.value + "%" },
+    markLine: { symbol: "none", label: { formatter: "2020 level" },
+                lineStyle: { color: "#1B2A32", type: "dashed" }, data: [{ xAxis: 100 }] },
+  }],
+  tooltip: { formatter: p => rk[p.dataIndex].flag
+      ? `${rk[p.dataIndex].name}: ${p.value}%<br>⚠ ${rk[p.dataIndex].flag}`
+      : `${rk[p.dataIndex].name}: ${p.value}%` },
+});
+
+// ---------- monthly lines ----------
+const PAL = ["#0B7285","#E8590C","#5F3DC4","#2B8A3E","#C2255C","#1971C2","#B0B7BC","#CED4DA"];
+const order = ["Sydney CBD","North Sydney","Chatswood","Macquarie Park","Parramatta",
+               "Strathfield","Newcastle and surrounds","Wollongong and surrounds"];
+echarts.init(document.getElementById("monthlyChart")).setOption({
+  grid: GRID, tooltip: { trigger: "axis" },
+  legend: { type: "scroll", top: 0 },
+  xAxis: { type: "category", data: DATA.months },
+  yAxis: { type: "value", axisLabel: { formatter: "{value}%" } },
+  series: order.map((r, i) => ({
+    name: r, type: "line", showSymbol: false, data: DATA.monthly[r],
+    lineStyle: { width: r === "Sydney CBD" ? 3 : 1.6,
+                 type: i > 5 ? "dashed" : "solid" },
+    color: PAL[i],
+    markLine: i === 0 ? { symbol: "none", silent: true,
+      lineStyle: { color: "#999", type: "dotted" },
+      label: { formatter: p => p.name, position: "insideEndTop" },
+      data: [{ name: "Lockdown 1", xAxis: "2020-03" },
+             { name: "Delta", xAxis: "2021-06" },
+             { name: "100%", yAxis: 100, lineStyle: { color: "#1B2A32", type: "dashed" } }] } : undefined,
+  })),
+});
+
+// ---------- dow heatmap ----------
+const dowRegions = order.filter(r => !r.includes("surrounds"));
+const heatData = [];
+dowRegions.forEach((r, y) => DATA.dowHeat[r].forEach((v, x) => heatData.push([x, y, v])));
+echarts.init(document.getElementById("dowChart")).setOption({
+  grid: { left: 110, right: 20, top: 10, bottom: 60 },
+  xAxis: { type: "category", data: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+  yAxis: { type: "category", data: dowRegions },
+  visualMap: { min: 75, max: 105, orient: "horizontal", left: "center", bottom: 0,
+               inRange: { color: ["#D64550", "#F2C94C", "#2B8A3E"] } },
+  series: [{ type: "heatmap", data: heatData,
+             label: { show: true, formatter: p => p.value[2] + "%" } }],
+  tooltip: { formatter: p => `${dowRegions[p.value[1]]} · ${["Mon","Tue","Wed","Thu","Fri"][p.value[0]]}: ${p.value[2]}% of midweek` },
+});
+
+// ---------- hourly profile ----------
+echarts.init(document.getElementById("hourChart")).setOption({
+  grid: GRID, tooltip: { trigger: "axis" }, legend: { top: 0 },
+  xAxis: { type: "category", data: [...Array(24).keys()].map(h => h + ":00") },
+  yAxis: { type: "value" },
+  series: [
+    { name: "Feb 2020", type: "line", data: DATA.hourly.h2020, color: MUTED,
+      areaStyle: { opacity: .15 }, showSymbol: false },
+    { name: "2026 H1", type: "line", data: DATA.hourly.h2026, color: ACCENT,
+      areaStyle: { opacity: .2 }, showSymbol: false },
+  ],
+});
+
+// ---------- evening by dow ----------
+echarts.init(document.getElementById("eveningChart")).setOption({
+  grid: GRID, tooltip: { trigger: "axis" }, legend: { top: 0 },
+  xAxis: { type: "category", data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+  yAxis: { type: "value" },
+  series: [
+    { name: "Feb 2020", type: "bar", data: DATA.evening.e2020, color: MUTED },
+    { name: "2026 H1", type: "bar", data: DATA.evening.e2026,
+      color: ACCENT,
+      itemStyle: { color: p => p.dataIndex >= 5 ? "#2B8A3E" : ACCENT } },
+  ],
+});
+
+// ---------- weekend ratio ----------
+echarts.init(document.getElementById("ratioChart")).setOption({
+  grid: GRID, tooltip: { trigger: "axis" },
+  xAxis: { type: "category", data: DATA.wkRatio.quarters },
+  yAxis: { type: "value", min: 30, axisLabel: { formatter: "{value}%" } },
+  series: [{ type: "line", data: DATA.wkRatio.ratio, color: ACCENT, showSymbol: false,
+             areaStyle: { opacity: .12 } }],
+});
+
+// ---------- mode share ----------
+echarts.init(document.getElementById("modeChart")).setOption({
+  grid: GRID, tooltip: { trigger: "axis" }, legend: { top: 0 },
+  xAxis: { type: "category", data: DATA.modeShare.years },
+  yAxis: { type: "value", max: 100, axisLabel: { formatter: "{value}%" } },
+  series: Object.entries(DATA.modeShare.modes).map(([mo, vals], i) => ({
+    name: mo, type: "line", stack: "share", areaStyle: {}, showSymbol: false,
+    data: vals, color: PAL[i],
+  })),
+});
+
+// ---------- wollongong ----------
+echarts.init(document.getElementById("wollChart")).setOption({
+  grid: GRID, tooltip: { trigger: "axis" }, legend: { top: 0 },
+  xAxis: { type: "category", data: DATA.woll.years },
+  yAxis: { type: "value", name: "tap-ons (millions)" },
+  series: [
+    { name: "Bus", type: "line", data: DATA.woll.bus, color: "#E8590C", lineStyle: { width: 3 } },
+    { name: "Train", type: "line", data: DATA.woll.train, color: ACCENT },
+  ],
+});
+
+// resize all
+window.addEventListener("resize", () =>
+  document.querySelectorAll(".chart").forEach(el => {
+    const c = echarts.getInstanceByDom(el); if (c) c.resize();
+  }));
+</script>
+</body>
+</html>

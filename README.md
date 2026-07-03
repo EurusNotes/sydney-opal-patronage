@@ -86,9 +86,6 @@ python3 pipeline/gen_web_data.py
 Transport for NSW Open Data Hub, CC-BY. Hourly tap-ons/offs by mode and commercial
 centre. Known issues and how they are handled: [docs/DATA_QUALITY.md](docs/DATA_QUALITY.md).
 
-## Author
 
-**Chenxi Liu** — Sydney · [LinkedIn](https://linkedin.com/in/chenxi-liu-data) ·
-[Portfolio](https://chenxi-ten.vercel.app/) · reach.chenxi@gmail.com
 
 *Independent analysis; not affiliated with Transport for NSW.*
